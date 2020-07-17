@@ -174,9 +174,10 @@ New-Variable -name 'myUserName' -Value 'twbook' -Force
 New-Variable -name 'myPassword' -Value "COREi5vPro0" -Force
 New-Variable -Name 'licenseFile' -Visibility Public -Value 'D:\Binn\fin.flf' -Force
 
+16.0.11240.11946
 
-New-BCSandbox Bison15 'mcr.microsoft.com/businesscentral/onprem:15.4.41023.41345-na'
-Import-App -containerName Bison15 -appFullPathFile 'D:\Repos\Rand Group_Bison Oilfield Services_1.1.0.85.app'
+New-BCSandbox Bison16 'mcr.microsoft.com/businesscentral/onprem:16.0.11240.12188-us'
+#Import-App -containerName Bison15 -appFullPathFile 'D:\Repos\Rand Group_Bison Oilfield Services_1.1.0.85.app'
 
 #Get-NavContainerAppInfo -containerName 'BISON' -symbolsOnly
 #Import-NavContainerLicense -licenseFile 'D:\Binn\fin.flf' -containerName $containername

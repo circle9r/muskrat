@@ -4,11 +4,11 @@ function Get-Artifact {
     # Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for current version (Latest)"
     # Get-BCArtifactUrl -country "us"
 
-    Write-Host -ForegroundColor Yellow "Get all US sandbox artifact urls"
-    Get-BCArtifactUrl  -select All -version "15" 
+    #Write-Host -ForegroundColor Yellow "Get all US sandbox artifact urls"
+    #Get-BCArtifactUrl  -select All -version "16.0" -country "us"
 
-    # Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for a version closest to 16.2.13509.13700"
-    # Get-BCArtifactUrl -country "us" -version "16.2.13509.13700" -select Closest
+    Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for a version closest to 16.0.11240.12188"
+    Get-BCArtifactUrl -country "us" -version "16.0.11240.12188" -select Closest
 
     # Write-Host -ForegroundColor Yellow "Get latest 16.1 US sandbox artifact url"
     # Get-BCArtifactUrl -country "us" -version "16.1"
@@ -53,8 +53,9 @@ function FunctionName {
     c:\bcartifacts.cache\sandbox\16.2.13509.14082\platform
 }
 
-function MyImage {
-    $artifactUrl = Get-BCArtifactUrl -country "us" -version "15"
+function Get-Image {
+    param ($version)
+    $artifactUrl = Get-BCArtifactUrl -country 'us' -version $version
     New-BcImage -artifactUrl $artifactUrl -imageName myownimage:latest
     docker images
     docker inspect myownimage:latest
@@ -79,9 +80,10 @@ function FunctionName {
 }
 
 
-#MyImage
+MyImage -version '16.0.11240.12188'
 #Get-NavArtifact(2017, 'na')
 
 #Download-Artifacts -artifactUrl (Get-BCArtifactUrl -country "us") -includePlatform
 #Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/sandbox/15.4.41023.43755/us" -basePath "D:\Artifacts\"  -includePlatform
-Get-Artifact
+#Get-Artifact
+
