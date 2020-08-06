@@ -7,8 +7,8 @@ function Get-Artifact {
     #Write-Host -ForegroundColor Yellow "Get all US sandbox artifact urls"
     #Get-BCArtifactUrl  -select All -version "16.0" -country "us"
 
-    Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for a version closest to 16.0.11240.12188"
-    Get-BCArtifactUrl -country "us" -version "16.0.11240.12188" -select Closest
+    Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for a version closest to " $MyImage
+    Get-BCArtifactUrl -country "us" -version $MyImage -select Closest
 
     # Write-Host -ForegroundColor Yellow "Get latest 16.1 US sandbox artifact url"
     # Get-BCArtifactUrl -country "us" -version "16.1"
@@ -22,14 +22,8 @@ function Get-Artifact {
 }
 
 function Get-NavArtifact {
-    [CmdletBinding()]
-    param ($navVersion, $countryCode)
-
-    Write-Host -ForegroundColor Yellow "Get all NAV " + $navVersion + " " + $countryCode + " artifact Urls"
-    (Get-NavArtifactUrl -nav 2017 -country $countryCode -select all).count
-
     Write-Host -ForegroundColor Yellow "Get latest NA onprem artifact Url"
-    Get-BCArtifactUrl -country $countryCode -type OnPrem
+    Get-BCArtifactUrl -country 'na' -type OnPrem -version $MyImage  -select Closest
 }
 
 
@@ -62,28 +56,17 @@ function Get-Image {
 }
 
 
-function FunctionName {
-
-    Remove-NavContainer test
-    Measure-Command {
-        $artifactUrl = Get-BCArtifactUrl -version 16.1 -select Latest -country us
-        $credential = New-Object pscredential 'admin', (ConvertTo-SecureString -String 'P@ssword1' -AsPlainText -Force)
-        New-NavContainer `
-            -accept_eula `
-            -containerName test `
-            -artifactUrl $artifactUrl `
-            -Credential $credential `
-            -auth UserPassword `
-            -updateHosts `
-            -imagename myown
-    }
-}
 
 
-MyImage -version '16.0.11240.12188'
-#Get-NavArtifact(2017, 'na')
 
-#Download-Artifacts -artifactUrl (Get-BCArtifactUrl -country "us") -includePlatform
+
+
+#System Application
+$MyImage = '16.3.14085.14287'
+#Get-NavArtifact
+
+Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/na" -includePlatform
 #Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/sandbox/15.4.41023.43755/us" -basePath "D:\Artifacts\"  -includePlatform
 #Get-Artifact
 
+#Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/us" -basePath "D:\Artifacts\"  -includePlatform

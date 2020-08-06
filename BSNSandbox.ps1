@@ -169,18 +169,41 @@ function Get-Tests {
                 $first = $false        
         }
 }
+        
+function NewBCSandboxFromArtifact {
+        param ($containerName, $version)
+        $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
+        $credential = New-Object PSCredential $myUserName, $password
+        
+        Remove-NavContainer $containerName
+        Measure-Command {
+            $artifactUrl = Get-BCArtifactUrl -version $version -select Latest -country us            
+            New-BCContainer `
+                -accept_eula `
+                -containerName $containerName `
+                -artifactUrl $artifactUrl `
+                -Credential $credential `
+                -auth UserPassword `
+                -updateHosts `
+                -imagename myown
+        }
+}
 
 New-Variable -name 'myUserName' -Value 'twbook' -Force
 New-Variable -name 'myPassword' -Value "COREi5vPro0" -Force
 New-Variable -Name 'licenseFile' -Visibility Public -Value 'D:\Binn\fin.flf' -Force
 
-16.0.11240.11946
+#$MyImage = '16.3.14085.14287'
+#Import-Tests Bison
+#NewBCSandboxFromArtifact wombat '16.3'
 
-New-BCSandbox Bison16 'mcr.microsoft.com/businesscentral/onprem:16.0.11240.12188-us'
-#Import-App -containerName Bison15 -appFullPathFile 'D:\Repos\Rand Group_Bison Oilfield Services_1.1.0.85.app'
+#New-BCSandbox Bison 'mcr.microsoft.com/businesscentral/onprem:16.3.14085.14238-na'
+#Import-App -containerName Bison -appFullPathFile 'D:\Repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.0.87.app'
+
+Set-NewUser wombat 'hrbook' 'hrbook06' 'thomas.book@bisonok.com'
 
 #Get-NavContainerAppInfo -containerName 'BISON' -symbolsOnly
-#Import-NavContainerLicense -licenseFile 'D:\Binn\fin.flf' -containerName $containername
-#Set-NewUser Test2 'hrbook' 'hrbook06' 'thomas.book@bisonok.com'
-#Import-Tests Bison
+Import-NavContainerLicense -licenseFile 'D:\Binn\fin.flf' -containerName wombat
+
+
 
