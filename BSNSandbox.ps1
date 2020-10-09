@@ -5,7 +5,7 @@ function New-BCSandbox {
         param ($containerName, $imageName)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
-                
+
         Write-Host -ForegroundColor Yellow 'My Credential: ' $credential.UserName
         Write-Host -ForegroundColor Yellow 'Container: : ' $containerName
 
@@ -18,7 +18,7 @@ function New-BCSandbox {
                 -updatehosts `
                 -EnableTaskScheduler:$false `
                 -containerName $containerName
-                
+
         Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Mexico S.A.'
         Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Canada, Inc.'
 
@@ -32,7 +32,7 @@ function New-BCSandbox-HostSQL {
         param ($containerName, $imageName)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
-                
+
         Write-Host -ForegroundColor Yellow 'My Credential: ' $credential.UserName
         Write-Host -ForegroundColor Yellow 'Container: : ' $containerName
 
@@ -50,7 +50,7 @@ function New-BCSandbox-HostSQL {
                 -databaseInstance 'SQL2019' `
                 -databaseName 'Financialsus' `
                 -databaseCredential $dbcredentials
-    
+
         #New-NavContainerNavUser -containerName $containerName -Credential $credential -ChangePasswordAtNextLogOn:$false -PermissionSetId SUPER
         Move-Shortcuts($containerName)
 
@@ -62,10 +62,10 @@ function New-NAVSandbox {
         param ($containerName, $imageName)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
-                
+
         Write-Host -ForegroundColor Yellow 'My Credential: ' $credential.UserName
         Write-Host -ForegroundColor Yellow 'Container: : ' $containerName
-        
+
         New-NavContainer `
                 -accept_eula `
                 -accept_outdated `
@@ -76,7 +76,7 @@ function New-NAVSandbox {
                 -imageName $imageName `
                 -containerName $containerName
 
-        Move-Shortcuts($containerName)        
+        Move-Shortcuts($containerName)
 
         Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Mexico S.A.'
         Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Canada, Inc.'
@@ -89,7 +89,7 @@ function New-NAVSandbox {
 function Set-NewUser {
         [CmdletBinding()]
         param ($containerName, $userName, $userPassword, $authenticationEmail)
-        
+
         $password = ConvertTo-SecureString -String $userPassword -AsPlainText -Force
         $credential = New-Object PSCredential $userName, $password
 
@@ -106,15 +106,15 @@ function Import-Tests {
         param ($containerName)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
-        
-        Import-TestToolkitToBCContainer -containerName $containerName -credential $credential 
+
+        Import-TestToolkitToBCContainer -containerName $containerName -credential $credential
 }
 
 function  Import-App {
-        param ($containerName, $appFullPathFile)        
+        param ($containerName, $appFullPathFile)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
- 
+
         Publish-NavContainerApp -containerName $containerName `
                 -appFile $appFullPathFile `
                 -install `
@@ -166,18 +166,18 @@ function Get-Tests {
                         -XUnitResultFileName $xunitResultsFile `
                         -AppendToXUnitResultFile:(!$first) `
                         -testCodeunit $_.Id
-                $first = $false        
+                $first = $false
         }
 }
-        
+
 function NewBCSandboxFromArtifact {
         param ($containerName, $version)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
-        
+
         Remove-NavContainer $containerName
         Measure-Command {
-            $artifactUrl = Get-BCArtifactUrl -version $version -select Latest -country us            
+            $artifactUrl = Get-BCArtifactUrl -version $version -select Latest -country us
             New-BCContainer `
                 -accept_eula `
                 -containerName $containerName `
@@ -191,19 +191,16 @@ function NewBCSandboxFromArtifact {
 
 New-Variable -name 'myUserName' -Value 'twbook' -Force
 New-Variable -name 'myPassword' -Value "COREi5vPro0" -Force
-New-Variable -Name 'licenseFile' -Visibility Public -Value 'D:\Binn\fin.flf' -Force
+New-Variable -Name 'licenseFile' -Visibility Public -Value 'C:\Binn\fin.flf' -Force
 
-#$MyImage = '16.3.14085.14287'
-#Import-Tests Bison
-#NewBCSandboxFromArtifact wombat '16.3'
+$MyImage = '16.5.15897.15953'
+NewBCSandboxFromArtifact Bison $MyImage
+Import-BCContainerLicense -licenseFile 'C:\Binn\fin.flf' -containerName 'Bison'
+import-App -containerName Bison -appFullPathFile 'C:\Repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.0.88.app'
+import-Tests Bison
+Set-NewUser  'Bison' 'testuser' 'testuser' 'testuser@bisonok.com'
+Get-NavContainerAppInfo -containerName 'Bison' -symbolsOnly
 
-#New-BCSandbox Bison 'mcr.microsoft.com/businesscentral/onprem:16.3.14085.14238-na'
-#Import-App -containerName Bison -appFullPathFile 'D:\Repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.0.87.app'
-
-Set-NewUser wombat 'hrbook' 'hrbook06' 'thomas.book@bisonok.com'
-
-#Get-NavContainerAppInfo -containerName 'BISON' -symbolsOnly
-Import-NavContainerLicense -licenseFile 'D:\Binn\fin.flf' -containerName wombat
 
 
 

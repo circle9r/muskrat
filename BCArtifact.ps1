@@ -18,7 +18,7 @@ function Get-Artifact {
 
     #Write-Host -ForegroundColor Yellow "Get all North America NAV and Business Central artifact urls"
     #Get-BCArtifactUrl -country "us" -version "15"  -select All
-    
+
 }
 
 function Get-NavArtifact {
@@ -28,7 +28,7 @@ function Get-NavArtifact {
 
 
 function FunctionName {
-    
+
     PS c:\temp> Download-Artifacts -artifactUrl (Get-BCArtifactUrl -country "us") -includePlatform
 
     Downloading application artifact /sandbox/16.2.13509.14082/us
@@ -58,15 +58,13 @@ function Get-Image {
 
 
 
-
-
-
 #System Application
-$MyImage = '16.3.14085.14287'
-#Get-NavArtifact
+$MyImage = '16.5.15897.17019'
+Get-NavArtifact
 
-Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/na" -includePlatform
-#Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/sandbox/15.4.41023.43755/us" -basePath "D:\Artifacts\"  -includePlatform
+
+Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.5.15897.15953/na" -includePlatform -basePath "C:\Artifacts\"
+#Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/sandbox/15.4.41023.43755/us" -basePath "C:\Artifacts\"  -includePlatform
 #Get-Artifact
 
 #Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/us" -basePath "D:\Artifacts\"  -includePlatform

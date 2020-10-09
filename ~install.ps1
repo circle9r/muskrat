@@ -1,5 +1,5 @@
 #Get-ExecutionPolicy -List
-
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 get-command -Module navcontainerhelper
-Write-NavContainerHelperWelcomeText 
 Install-Module -Name navcontainerhelper -Force
+Write-NavContainerHelperWelcomeText
