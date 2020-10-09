@@ -10,5 +10,5 @@
 
 ## Install navcontainerhelper
 * get-command -Module navcontainerhelper
-* Write-NavContainerHelperWelcomeText
 * install-module navcontainerhelper -force
+* Write-NavContainerHelperWelcomeText
