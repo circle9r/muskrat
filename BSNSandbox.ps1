@@ -1,4 +1,25 @@
 #Set-Variable -Name password -Option Constant -Value ConvertTo-SecureString -String "COREi5vPro0" -AsPlainText -Force
+function Get-Artifact {
+        # Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for current version (Latest)"
+        # Get-BCArtifactUrl -country "us"
+
+        #Write-Host -ForegroundColor Yellow "Get all US sandbox artifact urls"
+       # Get-BCArtifactUrl  -select All -version "16.0" -country "us"
+
+        Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for a version closest to " $MyImage
+        Get-BCArtifactUrl -country "us" -version $MyImage -select Closest
+
+        #Write-Host -ForegroundColor Yellow "Get latest 14.1 US sandbox artifact url"
+        #Get-BCArtifactUrl -country "ch" -version "14.1" -select All
+
+        #Write-Host -ForegroundColor Yellow "Get latest 15.x US sandbox artifact url"
+        #Get-BCArtifactUrl -country "us" -version "15"
+
+        #Write-Host -ForegroundColor Yellow "Get all North America NAV and Business Central artifact urls"
+        #Get-BCArtifactUrl -country "us" -version "15"  -select All
+
+
+}
 
 function New-BCSandbox {
         [CmdletBinding()]
@@ -19,8 +40,8 @@ function New-BCSandbox {
                 -EnableTaskScheduler:$false `
                 -containerName $containerName
 
-        Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Mexico S.A.'
-        Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Canada, Inc.'
+        #Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Mexico S.A.'
+        #Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Canada, Inc.'
 
         Move-Shortcuts($containerName)
 
@@ -92,6 +113,8 @@ function Set-NewUser {
 
         $password = ConvertTo-SecureString -String $userPassword -AsPlainText -Force
         $credential = New-Object PSCredential $userName, $password
+
+        BCOn
 
         New-BCContainerBCUser -Credential $credential `
                 -AuthenticationEmail $authenticationEmail `
@@ -177,29 +200,34 @@ function NewBCSandboxFromArtifact {
 
         Remove-NavContainer $containerName
         Measure-Command {
-            $artifactUrl = Get-BCArtifactUrl -version $version -select Latest -country us
-            New-BCContainer `
-                -accept_eula `
-                -containerName $containerName `
-                -artifactUrl $artifactUrl `
-                -Credential $credential `
-                -auth UserPassword `
-                -updateHosts `
-                -imagename myown
+                $artifactUrl = Get-BCArtifactUrl -country "us" -version $version -select closest
+                New-BCContainer `
+                        -accept_eula `
+                        -containerName $containerName `
+                        -artifactUrl $artifactUrl `
+                        -Credential $credential `
+                        -auth UserPassword `
+                        -updateHosts
+
         }
 }
 
 New-Variable -name 'myUserName' -Value 'twbook' -Force
 New-Variable -name 'myPassword' -Value "COREi5vPro0" -Force
 New-Variable -Name 'licenseFile' -Visibility Public -Value 'C:\Binn\fin.flf' -Force
+$version = '17.0.0.0'
+$containerName = 'Bison'
 
-$MyImage = '16.5.15897.15953'
-NewBCSandboxFromArtifact Bison $MyImage
-Import-BCContainerLicense -licenseFile 'C:\Binn\fin.flf' -containerName 'Bison'
-import-App -containerName Bison -appFullPathFile 'C:\Repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.0.88.app'
-import-Tests Bison
-Set-NewUser  'Bison' 'testuser' 'testuser' 'testuser@bisonok.com'
-Get-NavContainerAppInfo -containerName 'Bison' -symbolsOnly
+
+NewBCSandboxFromArtifact $containerName $version
+Import-BCContainerLicense -licenseFile $licenseFile -containerName $containerName -Verbose -restart
+Set-NewUser  $containerName 'testuser' 'Bison01!' 'testuser@bisonok.com'
+Import-Tests $containerName
+
+#import-App $Name 'C:\binn\source\repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.0.88.app'
+# Get-NavContainerAppInfo -containerName 'Bison' -symbolsOnly
+
+
 
 
 

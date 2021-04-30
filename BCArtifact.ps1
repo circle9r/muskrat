@@ -8,10 +8,10 @@ function Get-Artifact {
     #Get-BCArtifactUrl  -select All -version "16.0" -country "us"
 
     Write-Host -ForegroundColor Yellow "Get US sandbox artifact url for a version closest to " $MyImage
-    Get-BCArtifactUrl -country "us" -version $MyImage -select Closest
+    Get-BCArtifactUrl -country "ch" -version $MyImage -select Closest
 
-    # Write-Host -ForegroundColor Yellow "Get latest 16.1 US sandbox artifact url"
-    # Get-BCArtifactUrl -country "us" -version "16.1"
+    #Write-Host -ForegroundColor Yellow "Get latest 14.1 US sandbox artifact url"
+    Get-BCArtifactUrl -country "ch" -version "14.1" -select All
 
     #Write-Host -ForegroundColor Yellow "Get latest 15.x US sandbox artifact url"
     #Get-BCArtifactUrl -country "us" -version "15"
@@ -21,10 +21,10 @@ function Get-Artifact {
 
 }
 
-function Get-NavArtifact {
-    Write-Host -ForegroundColor Yellow "Get latest NA onprem artifact Url"
-    Get-BCArtifactUrl -country 'na' -type OnPrem -version $MyImage  -select Closest
-}
+# function Get-NavArtifact {
+#     Write-Host -ForegroundColor Yellow "Get latest NA onprem artifact Url"
+#     Get-BCArtifactUrl -country 'na' -type OnPrem -version $MyImage  -select Closest
+# }
 
 
 function FunctionName {
@@ -56,15 +56,17 @@ function Get-Image {
 }
 
 
-
-
 #System Application
-$MyImage = '16.5.15897.17019'
-Get-NavArtifact
+$MyImage = '17.5.0.0'
+#$MyImage = ''14.0.32615' '
+#Get-Artifact
 
 
-Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.5.15897.15953/na" -includePlatform -basePath "C:\Artifacts\"
+#Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/sandbox/17.0.16993.0/ch" -includePlatform -basePath "C:\Artifacts\"
 #Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/sandbox/15.4.41023.43755/us" -basePath "C:\Artifacts\"  -includePlatform
 #Get-Artifact
 
 #Download-Artifacts -artifactUrl "https://bcartifacts.azureedge.net/onprem/16.3.14085.14238/us" -basePath "D:\Artifacts\"  -includePlatform
+
+
+Get-BcArtifactUrl -type sandbox -country us -select Latest
