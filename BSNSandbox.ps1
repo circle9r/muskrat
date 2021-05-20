@@ -21,33 +21,6 @@ function Get-Artifact {
 
 }
 
-function New-BCSandbox {
-        [CmdletBinding()]
-        param ($containerName, $imageName)
-        $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
-        $credential = New-Object PSCredential $myUserName, $password
-
-        Write-Host -ForegroundColor Yellow 'My Credential: ' $credential.UserName
-        Write-Host -ForegroundColor Yellow 'Container: : ' $containerName
-
-        New-BCContainer -accept_eula `
-                -accept_outdated `
-                -licenseFile $licenseFile `
-                -imageName $imageName `
-                -auth NavUserPassword `
-                -credential $credential `
-                -updatehosts `
-                -EnableTaskScheduler:$false `
-                -containerName $containerName
-
-        #Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Mexico S.A.'
-        #Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Canada, Inc.'
-
-        Move-Shortcuts($containerName)
-
-        Write-Host -ForegroundColor Yellow 'Container Created: : ' $containerName
-}
-
 function New-BCSandbox-HostSQL {
         [CmdletBinding()]
         param ($containerName, $imageName)
@@ -78,35 +51,6 @@ function New-BCSandbox-HostSQL {
         Write-Host -ForegroundColor Yellow 'Container Created: : ' $containerName
 }
 
-function New-NAVSandbox {
-        [CmdletBinding()]
-        param ($containerName, $imageName)
-        $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
-        $credential = New-Object PSCredential $myUserName, $password
-
-        Write-Host -ForegroundColor Yellow 'My Credential: ' $credential.UserName
-        Write-Host -ForegroundColor Yellow 'Container: : ' $containerName
-
-        New-NavContainer `
-                -accept_eula `
-                -accept_outdated `
-                -includeCSide `
-                -auth NavUserPassword `
-                -licenseFile $licenseFile `
-                -credential $credential `
-                -imageName $imageName `
-                -containerName $containerName
-
-        Move-Shortcuts($containerName)
-
-        Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Mexico S.A.'
-        Remove-CompanyInBCContainer -containerName $containerName -CompanyName 'CRONUS Canada, Inc.'
-
-        Move-Shortcuts($containerName)
-
-        Write-Host -ForegroundColor Yellow 'Container Created: : ' $containerName
-}
-
 function Set-NewUser {
         [CmdletBinding()]
         param ($containerName, $userName, $userPassword, $authenticationEmail)
@@ -124,14 +68,6 @@ function Set-NewUser {
         Move-Shortcuts($containerName)
 }
 
-function Import-Tests {
-        [CmdletBinding()]
-        param ($containerName)
-        $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
-        $credential = New-Object PSCredential $myUserName, $password
-
-        Import-TestToolkitToBCContainer -containerName $containerName -credential $credential
-}
 
 function  Import-App {
         param ($containerName, $appFullPathFile)
@@ -160,7 +96,7 @@ function Move-Shortcuts {
 
         New-Item -Path $destination -ItemType Directory -Force
         if (Test-Path -Path $lnkWebFile) {
-                Move-Item -Path $lnkWebFile -Destination $destination -Force -
+                Move-Item -Path $lnkWebFile -Destination $destination -Force
         }
         if (Test-Path -Path $lnkCommandFile) {
                 Move-Item -Path $lnkCommandFile -Destination $destination -Force
@@ -169,7 +105,6 @@ function Move-Shortcuts {
                 Move-Item -Path $lnkPowerShellFile -Destination $destination -Force
         }
 }
-
 
 function Get-Tests {
         [CmdletBinding()]
@@ -193,42 +128,52 @@ function Get-Tests {
         }
 }
 
+function Import-BCTests {
+        [CmdletBinding()]
+        param ($containerName)
+        $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
+        $credential = New-Object PSCredential $myUserName, $password
+
+        Import-TestToolkitToBCContainer -containerName $containerName -credential $credential
+}
+
 function NewBCSandboxFromArtifact {
         param ($containerName, $version)
         $password = ConvertTo-SecureString -String $myPassword -AsPlainText -Force
         $credential = New-Object PSCredential $myUserName, $password
 
-        Remove-NavContainer $containerName
+        Remove-BCContainer $containerName
+
         Measure-Command {
-                $artifactUrl = Get-BCArtifactUrl -country "us" -version $version -select closest
-                New-BCContainer `
+                 $artifactUrl = Get-BCArtifactUrl -country "us" -version $version -select closest
+                 New-BCContainer `
                         -accept_eula `
                         -containerName $containerName `
                         -artifactUrl $artifactUrl `
                         -Credential $credential `
                         -auth UserPassword `
+                        -licenseFile $licenseFile `
+                        -additionalParameters @("-e customNavSettings=UsePermissionSetsFromExtensions=false") `
                         -updateHosts
+
+
+                Import-TestToolkitToBCContainer -containerName $containerName -credential $credential
 
         }
 }
 
+Clear-Host
 New-Variable -name 'myUserName' -Value 'twbook' -Force
 New-Variable -name 'myPassword' -Value "COREi5vPro0" -Force
 New-Variable -Name 'licenseFile' -Visibility Public -Value 'C:\Binn\fin.flf' -Force
-$version = '17.0.0.0'
+$version = '18.1.0.0'
 $containerName = 'Bison'
 
-
 NewBCSandboxFromArtifact $containerName $version
-Import-BCContainerLicense -licenseFile $licenseFile -containerName $containerName -Verbose -restart
-Set-NewUser  $containerName 'testuser' 'Bison01!' 'testuser@bisonok.com'
-Import-Tests $containerName
+#Set-NewUser  $containerName 'testuser' 'Bison01!' 'testuser@bisonok.com'
 
-#import-App $Name 'C:\binn\source\repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.0.88.app'
-# Get-NavContainerAppInfo -containerName 'Bison' -symbolsOnly
-
-
-
+#import-App $containerName 'C:\binn\source\repos\condor\Bison\.alpackages\Rand Group_Bison Oilfield Services_1.1.10.15.app'
+#Get-BCContainerAppInfo -containerName  $containerName -symbolsOnly
 
 
 
